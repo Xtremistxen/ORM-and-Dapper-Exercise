@@ -4,24 +4,19 @@ using Microsoft.Extensions.Configuration;
 
 namespace ORM_Dapper
 {
-    public class Program
+    public static class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[]args)
         {
             var config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
                 .Build();
 
-            string connString = config.GetConnectionString("DefaultConnection");
+            var connString = config.GetConnectionString("DefaultConnection");
 
-            IDbConnection conn = new MySqlConnection(connString);
-            
-        }
-        
-        {
+            using IDbConnection conn = new MySqlConnection(connString);
             // create connection to db
-            
             var productRepo = new DapperProductRepository(conn);
 
             // Creating new product
@@ -36,51 +31,53 @@ namespace ORM_Dapper
             Console.WriteLine(product.Name + " " + product.Price);
 
             // Updating a product
-            Product prod = new Product
+            var prod = new Product
             {
                 Name = "Rad Roach Meat",
                 Price = 999,
                 CategoryID = 10,
-                StockLevel = ("25")
+                StockLevel = 25
             };
 
             productRepo.UpdateProduct(942, prod);
 
-            // This will delete product from the database
+            // This will delete a product from the database
             productRepo.DeleteProduct(941);
 
-            public static void RunDepartment(IDbConnection conn)
-            {
-                // create connection to db
-                var departmentRepo = new DapperDepartmentRepository(conn);
+            // Run department operations
+            RunDepartment(conn);
+        }
 
-                // create new department
-                //departmentRepo.CreateDepartment("XR");
+        private static void RunDepartment(IDbConnection conn)
+        {
+            // create connection to db
+            var departmentRepo = new DapperDepartmentRepository(conn);
 
-                // This will store all departments as an IEnumerable
-                var departments = departmentRepo.GetAllDepartments();
+            // create new department
+            //departmentRepo.CreateDepartment("XR");
 
-                // This will display all departments
-                departments.ToList().ForEach(x => Console.WriteLine($"\n{x.DepartmentID}: {x.Name}"));
+            // This will store all departments as an IEnumerable
+            var departments = departmentRepo.GetAllDepartments();
 
-                // This will update created department
-                departmentRepo.UpdateDepartment(6, "AR");
+            // This will display all departments
+            departments.ToList().ForEach(x => Console.WriteLine($"\n{x.DepartmentID}: {x.Name}"));
 
-                // This will display all departments
-                departments = departmentRepo.GetAllDepartments();
-                departments.ToList().ForEach(x => Console.WriteLine($"\n{x.DepartmentID}: {x.Name}"));
+            // This will update created department
+            departmentRepo.UpdateDepartment(6, "AR");
 
-                // This will Delete from department
-                departmentRepo.DeleteDepartment(7);
+            // This will display all departments
+            departments = departmentRepo.GetAllDepartments();
+            departments.ToList().ForEach(x => Console.WriteLine($"\n{x.DepartmentID}: {x.Name}"));
 
-                // This will display all departments
-                departments = departmentRepo.GetAllDepartments();
-                departments.ToList().ForEach(x => Console.WriteLine($"\n{x.DepartmentID}: {x.Name}"));
-            }
+            // This will Delete from department
+            departmentRepo.DeleteDepartment(7);
+
+            // This will display all departments
+            departments = departmentRepo.GetAllDepartments();
+            departments.ToList().ForEach(x => Console.WriteLine($"\n{x.DepartmentID}: {x.Name}"));
         }
     }
 }
-
 
 
 
