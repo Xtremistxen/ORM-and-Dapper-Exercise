@@ -6,75 +6,29 @@ namespace ORM_Dapper
 {
     public static class Program
     {
-        public static void Main(string[]args)
+        public static void Main(string[] args)
         {
             var config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
                 .Build();
-
             var connString = config.GetConnectionString("DefaultConnection");
-
             using IDbConnection conn = new MySqlConnection(connString);
             // create connection to db
-            var productRepo = new DapperProductRepository(conn);
 
-            // Creating new product
-            productRepo.CreateProduct("Mysterious Serum", 0.99, 10, "1");
+            var prodRepo = new DapperProductRepo(conn);
+            
+            prodRepo.CreateProduct("Boogerman", 49.99, 8);
+            prodRepo.UpdateProductName(941, "Escape From House of Dead");
+            prodRepo.DeleteProduct(941);
 
-            // Storing all products as an IEnumerable
-            var products = productRepo.GetAllProducts();
-            products.ToList().ForEach(x => Console.WriteLine(x.Name + ": " + x.Price));
+            var products = prodRepo.GetAllProducts();
 
-            // Selecting a single product
-            var product = productRepo.GetSingleProduct(941);
-            Console.WriteLine(product.Name + " " + product.Price);
-
-            // Updating a product
-            var prod = new Product
+            foreach (var product in products)
             {
-                Name = "Rad Roach Meat",
-                Price = 999,
-                CategoryID = 10,
-                StockLevel = 25
-            };
-
-            productRepo.UpdateProduct(942, prod);
-
-            // This will delete a product from the database
-            productRepo.DeleteProduct(941);
-
-            // Run department operations
-            RunDepartment(conn);
-        }
-
-        private static void RunDepartment(IDbConnection conn)
-        {
-            // create connection to db
-            var departmentRepo = new DapperDepartmentRepository(conn);
-
-            // create new department
-            //departmentRepo.CreateDepartment("XR");
-
-            // This will store all departments as an IEnumerable
-            var departments = departmentRepo.GetAllDepartments();
-
-            // This will display all departments
-            departments.ToList().ForEach(x => Console.WriteLine($"\n{x.DepartmentID}: {x.Name}"));
-
-            // This will update created department
-            departmentRepo.UpdateDepartment(6, "AR");
-
-            // This will display all departments
-            departments = departmentRepo.GetAllDepartments();
-            departments.ToList().ForEach(x => Console.WriteLine($"\n{x.DepartmentID}: {x.Name}"));
-
-            // This will Delete from department
-            departmentRepo.DeleteDepartment(7);
-
-            // This will display all departments
-            departments = departmentRepo.GetAllDepartments();
-            departments.ToList().ForEach(x => Console.WriteLine($"\n{x.DepartmentID}: {x.Name}"));
+                Console.WriteLine(
+                    $"ID: {product.ProductID} Name: {product.Name} Price: {product.Price} Category ID: {product.CategoryID} On Sale {product.OnSale} Stock Level: {product.StockLevel}");
+            }
         }
     }
 }
